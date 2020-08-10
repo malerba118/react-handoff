@@ -4,7 +4,7 @@ import { render } from "react-dom";
 import "./styles.css";
 
 function App() {
-  return <Heading>Welcome to Chakra + TS</Heading>;
+  return <Heading>Test</Heading>;
 }
 
 const rootElement = document.getElementById("root");

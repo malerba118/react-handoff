@@ -2,8 +2,8 @@ import { init } from "./react-handoff";
 
 const { createControls, ControlsProvider } = init({
   Box: {
-    card: {
-      rounded: true
+    fooo: {
+      bgg: "gray.100"
     }
   }
 });

@@ -46,8 +46,8 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
   const dimensionsAtom = atom({
     key: "dimensions",
     default: {
-      x: 0,
-      y: 0,
+      top: 0,
+      left: 0,
       height: 0,
       width: 0
     }
@@ -60,7 +60,7 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
     const family = atomFamily<Controls, string>({
       key,
       default: subkey => {
-        if (!defaults) {
+        if (!defaults || !defaults[key] || !defaults[key][subkey]) {
           return {};
         } else {
           return defaults[key][subkey];
@@ -130,7 +130,7 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
           {keys.key} > {keys.subkey}
         </Heading>
         <Stack spacing={2} py={2}>
-          {Object.keys(values).map(fieldName => {
+          {Object.keys(definitionsMap[keys.key]).map(fieldName => {
             const Field = definitionsMap[keys.key][fieldName];
             const value = values[fieldName];
             return (
@@ -174,16 +174,18 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
     const dimensions = useRecoilValue(dimensionsAtom);
     const { key } = useRecoilValue(selectedAtom);
 
+    console.log(dimensions);
+
     if (!families[key]) {
       return null;
     }
     return (
       <Box
         position="fixed"
-        top={dimensions.y}
-        left={dimensions.x}
         w={dimensions.width}
         h={dimensions.height}
+        top={dimensions.top}
+        left={dimensions.left}
         border="4px"
         borderStyle="dashed"
         borderColor="teal.400"
@@ -215,20 +217,4 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
     createControls,
     ControlsProvider
   };
-};
-
-interface BooleanFieldProps {
-  value: boolean;
-  onUpdate: (value: boolean) => void;
-}
-
-export const BooleanField: FC<BooleanFieldProps> = props => {
-  return (
-    <Switch
-      color="teal"
-      size="lg"
-      onChange={(e: any) => props.onUpdate(e.target.checked)}
-      isChecked={props.value}
-    />
-  );
 };

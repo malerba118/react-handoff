@@ -113,16 +113,14 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
     const [values, setValues] = useRecoilState(valuesAtom);
 
     return (
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          right: 0,
-          height: "100vh",
-          width: "300px",
-          borderLeft: "1px solid #ccc",
-          padding: 16
-        }}
+      <Box
+        position="fixed"
+        top={0}
+        right={0}
+        bottom={0}
+        width={300}
+        bg="gray.200"
+        p={4}
         onClick={e => {
           e.stopPropagation();
         }}
@@ -137,7 +135,7 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
             const value = values[fieldName];
             return (
               <Stack>
-                <FormLabel htmlFor="email">Email address</FormLabel>
+                <FormLabel htmlFor={fieldName}>{fieldName}</FormLabel>
                 <Field
                   key={fieldName}
                   value={value}
@@ -152,7 +150,7 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
             );
           })}
         </Stack>
-      </div>
+      </Box>
     );
   };
 
@@ -180,16 +178,16 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
       return null;
     }
     return (
-      <div
-        style={{
-          position: "fixed",
-          top: dimensions.y,
-          left: dimensions.x,
-          width: dimensions.width,
-          height: dimensions.height,
-          background: "rgba(50, 200, 50, .2)"
-        }}
-      ></div>
+      <Box
+        position="fixed"
+        top={dimensions.y}
+        left={dimensions.x}
+        w={dimensions.width}
+        h={dimensions.height}
+        border="4px"
+        borderStyle="dashed"
+        borderColor="teal.400"
+      />
     );
   };
 

@@ -1,17 +1,17 @@
-import { CSSReset, Heading, ThemeProvider } from "@chakra-ui/core";
+import { CSSReset, Heading, ThemeProvider, Switch } from "@chakra-ui/core";
 import * as React from "react";
 import { render } from "react-dom";
+import App from "./App";
+import { ControlsProvider } from "./controls";
 import "./styles.css";
-
-function App() {
-  return <Heading>Test</Heading>;
-}
 
 const rootElement = document.getElementById("root");
 render(
   <ThemeProvider>
     <CSSReset />
-    <App />
+    <ControlsProvider>
+      <App />
+    </ControlsProvider>
   </ThemeProvider>,
   rootElement
 );

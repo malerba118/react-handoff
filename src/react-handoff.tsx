@@ -1,4 +1,4 @@
-import React, { ComponentType, FC, useRef } from "react";
+import React, { ComponentType, FC, useRef, useEffect } from "react";
 import { Switch, Heading, Stack, Box, FormLabel } from "@chakra-ui/core";
 import {
   atom,
@@ -9,6 +9,7 @@ import {
   useSetRecoilState,
   RecoilState
 } from "recoil";
+import { onDimensions } from "./dimensions";
 
 type AtomFamily = (subkey: string) => RecoilState<any>;
 
@@ -42,6 +43,15 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
       subkey: ""
     }
   });
+  const dimensionsAtom = atom({
+    key: "dimensions",
+    default: {
+      x: 0,
+      y: 0,
+      height: 0,
+      width: 0
+    }
+  });
 
   const createControls = <Controls extends {}>(
     options: CreateControlsOptions<Controls>
@@ -64,6 +74,7 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
     const useControls = (options: UseControlsOptions) => {
       const ref = useRef<HTMLElement | null>();
       const setSelected = useSetRecoilState(selectedAtom);
+      const setDimensions = useSetRecoilState(dimensionsAtom);
       const values = useRecoilValue(family(options.subkey));
       const select = () => setSelected({ key, subkey: options.subkey });
 
@@ -76,6 +87,7 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
               e._reactHandoffStopPropagation = true;
             }
           });
+          onDimensions(el, setDimensions);
         }
       };
 
@@ -111,6 +123,9 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
           borderLeft: "1px solid #ccc",
           padding: 16
         }}
+        onClick={e => {
+          e.stopPropagation();
+        }}
       >
         <Heading size="lg">Controls</Heading>
         <Heading size="sm">
@@ -141,8 +156,46 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
     );
   };
 
+  const Listeners = () => {
+    const setSelected = useSetRecoilState(selectedAtom);
+
+    useEffect(() => {
+      const fn = (e: any) => {
+        if (!e._reactHandoffStopPropagation) {
+          setSelected({ key: "", subkey: "" });
+        }
+      };
+      window.addEventListener("click", fn);
+      return () => window.removeEventListener("click", fn);
+    }, []);
+
+    return null;
+  };
+
+  const SelectedIndicator = () => {
+    const dimensions = useRecoilValue(dimensionsAtom);
+    const { key } = useRecoilValue(selectedAtom);
+
+    if (!families[key]) {
+      return null;
+    }
+    return (
+      <div
+        style={{
+          position: "fixed",
+          top: dimensions.y,
+          left: dimensions.x,
+          width: dimensions.width,
+          height: dimensions.height,
+          background: "rgba(50, 200, 50, .2)"
+        }}
+      ></div>
+    );
+  };
+
   const ControlsPanel = () => {
     const { key, subkey } = useRecoilValue(selectedAtom);
+
     if (!families[key]) {
       return null;
     }
@@ -154,6 +207,8 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
       <RecoilRoot>
         {children}
         <ControlsPanel />
+        <SelectedIndicator />
+        <Listeners />
       </RecoilRoot>
     );
   };

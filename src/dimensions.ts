@@ -9,7 +9,7 @@ type Rect = {
 
 type DimensionsCallback = (contentRect: Rect) => void;
 
-const onDimensions = (el: HTMLElement, callback: DimensionsCallback) => {
+export const onDimensions = (el: HTMLElement, callback: DimensionsCallback) => {
   const observer = new ResizeObserver(entries => {
     if (entries[0]) {
       callback(entries[0].contentRect);

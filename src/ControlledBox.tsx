@@ -2,12 +2,21 @@ import { Box, BoxProps } from "@chakra-ui/core";
 import React, { FC } from "react";
 import { createControls } from "./controls";
 import { select } from "./fields";
+import { colorValues, spaceValues, sizeValues } from "./constants";
 import "./styles.css";
 
-const useControls = createControls({
+interface BoxControls {
+  bg: BoxProps["bg"];
+  p: BoxProps["p"];
+  fontSize: BoxProps["fontSize"];
+}
+
+const useControls = createControls<BoxControls>({
   key: "Box",
   definitions: {
-    bg: select(["gray.100", "gray.200", "gray.300"])
+    bg: select(colorValues),
+    p: select(spaceValues),
+    fontSize: select(sizeValues)
   }
 });
 
@@ -17,13 +26,29 @@ interface ControlledBoxProps extends BoxProps {
 
 const ControlledBox: FC<ControlledBoxProps> = ({
   controlsKey,
+  bg,
+  p,
+  fontSize,
   ...otherProps
 }) => {
   const { attach, values } = useControls({
-    subkey: controlsKey
+    subkey: controlsKey,
+    passthrough: {
+      bg,
+      p,
+      fontSize
+    }
   });
 
-  return <Box {...otherProps} ref={attach} bg={otherProps.bg || values.bg} />;
+  return (
+    <Box
+      {...otherProps}
+      ref={attach}
+      bg={values.bg}
+      p={values.p}
+      fontSize={values.fontSize}
+    />
+  );
 };
 
 export default ControlledBox;

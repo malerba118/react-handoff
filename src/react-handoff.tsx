@@ -1,5 +1,12 @@
 import React, { ComponentType, FC, useRef, useEffect } from "react";
-import { Switch, Heading, Stack, Box, FormLabel } from "@chakra-ui/core";
+import {
+  Heading,
+  Stack,
+  Box,
+  FormLabel,
+  Flex,
+  Checkbox
+} from "@chakra-ui/core";
 import {
   atom,
   atomFamily,
@@ -21,7 +28,7 @@ export interface FieldProps<T> {
 export type Field<T> = ComponentType<FieldProps<T>>;
 
 export type ControlDefinitions<Controls> = {
-  [K in keyof Controls]: Field<Controls[K]>;
+  [K in keyof Controls]: Field<any>;
 };
 
 export interface CreateControlsOptions<Controls> {
@@ -29,12 +36,11 @@ export interface CreateControlsOptions<Controls> {
   definitions: ControlDefinitions<Controls>;
 }
 
-export interface UseControlsOptions {
-  subkey: string;
-}
+type Defaults = Record<string, Record<string, { values: any; overrides: any }>>;
 
-export const init = (defaults?: Record<string, Record<string, any>>) => {
+export const init = (defaults?: Defaults) => {
   const families: Record<string, AtomFamily> = {};
+  const overridesFamilies: Record<string, AtomFamily> = {};
   const definitionsMap: Record<string, ControlDefinitions<any>> = {};
   const selectedAtom = atom({
     key: "selected",
@@ -56,27 +62,71 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
   const createControls = <Controls extends {}>(
     options: CreateControlsOptions<Controls>
   ) => {
+    type Overrides = {
+      [K in keyof Controls]: boolean;
+    };
     const key = options.key;
+    const definitions = options.definitions;
     const family = atomFamily<Controls, string>({
-      key,
+      key: `${key}-values`,
       default: subkey => {
-        if (!defaults || !defaults[key] || !defaults[key][subkey]) {
+        if (
+          !defaults ||
+          !defaults[key] ||
+          !defaults[key][subkey] ||
+          !defaults[key][subkey].values
+        ) {
           return {};
         } else {
-          return defaults[key][subkey];
+          return defaults[key][subkey].values;
+        }
+      }
+    });
+
+    const overridesFamily = atomFamily<Overrides, string>({
+      key: `${key}-overrides`,
+      default: subkey => {
+        if (
+          !defaults ||
+          !defaults[key] ||
+          !defaults[key][subkey] ||
+          !defaults[key][subkey].overrides
+        ) {
+          return {};
+        } else {
+          return defaults[key][subkey].overrides;
         }
       }
     });
 
     families[key] = family;
-    definitionsMap[key] = options.definitions;
+    overridesFamilies[key] = overridesFamily;
+    definitionsMap[key] = definitions;
+
+    interface UseControlsOptions {
+      subkey: string;
+      passthrough?: Partial<Controls>;
+    }
 
     const useControls = (options: UseControlsOptions) => {
       const ref = useRef<HTMLElement>();
       const [selected, setSelected] = useRecoilState(selectedAtom);
       const setDimensions = useSetRecoilState(dimensionsAtom);
-      const values = useRecoilValue(family(options.subkey));
+      let values: any = useRecoilValue(family(options.subkey));
+      const overrides: any = useRecoilValue(overridesFamily(options.subkey));
       const select = () => setSelected({ key, subkey: options.subkey });
+      const passthrough: any = options.passthrough || {};
+
+      values = { ...values };
+
+      Object.keys(definitions).forEach(key => {
+        if (!overrides[key]) {
+          values[key] =
+            passthrough[key] !== undefined ? passthrough[key] : values[key];
+        } else {
+          values[key] = values[key];
+        }
+      });
 
       useEffect(() => {
         if (
@@ -122,7 +172,7 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
       return {
         attach,
         select,
-        values
+        values: values as Controls
       };
     };
 
@@ -138,7 +188,12 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
 
   const Panel: FC<PanelProps> = ({ keys }) => {
     const valuesAtom = families[keys.key](keys.subkey);
+    const overridesAtom = overridesFamilies[keys.key](keys.subkey);
     const [values, setValues] = useRecoilState(valuesAtom);
+    const [overrides, setOverrides] = useRecoilState(overridesAtom);
+
+    console.log("values", values);
+    console.log("overrides", overrides);
 
     return (
       <Box
@@ -147,25 +202,40 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
         right={0}
         bottom={0}
         width={300}
-        bg="gray.200"
+        bg="gray.100"
         p={4}
         onClick={e => {
           e.stopPropagation();
         }}
       >
-        <Heading size="lg">Controls</Heading>
-        <Heading size="sm">
-          {keys.key} > {keys.subkey}
-        </Heading>
-        <Stack spacing={2} py={2}>
+        <Stack spacing="2">
+          <Heading size="lg">Controls</Heading>
+          <Heading size="xs" color="gray.500">
+            {keys.key} > {keys.subkey}
+          </Heading>
+        </Stack>
+        <Stack spacing={2} py={4}>
           {Object.keys(definitionsMap[keys.key]).map(fieldName => {
             const Field = definitionsMap[keys.key][fieldName];
             const value = values[fieldName];
             return (
-              <Stack>
-                <FormLabel htmlFor={fieldName}>{fieldName}</FormLabel>
+              <Stack key={fieldName}>
+                <Flex justify="space-between">
+                  <FormLabel htmlFor={fieldName}>{fieldName}</FormLabel>
+                  <Checkbox
+                    placeholder="Override"
+                    isChecked={!!overrides[fieldName]}
+                    onChange={e => {
+                      setOverrides((prev: any) => ({
+                        ...prev,
+                        [fieldName]: e.target.checked
+                      }));
+                    }}
+                  >
+                    Important
+                  </Checkbox>
+                </Flex>
                 <Field
-                  key={fieldName}
                   value={value}
                   onUpdate={val =>
                     setValues((prev: any) => ({
@@ -214,6 +284,7 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
     if (!families[key]) {
       return null;
     }
+
     return (
       <Box
         position="fixed"
@@ -245,8 +316,8 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
     return (
       <RecoilRoot>
         {children}
-        <ControlsPanel />
         <SelectedIndicator />
+        <ControlsPanel />
         <Listeners />
       </RecoilRoot>
     );

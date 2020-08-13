@@ -1,0 +1,12 @@
+{
+    "Box": {
+        "card": {
+        "values": {
+            "bg": "gray.100"
+        },
+        "overrides": {
+            "bg": false
+        }
+        }
+    }
+}

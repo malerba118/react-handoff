@@ -25,7 +25,6 @@ export interface SelectFieldProps {
 
 export const select = (options: string[]) => {
   const SelectField: FC<SelectFieldProps> = props => {
-    console.log(props);
     return (
       <Select
         placeholder="None"

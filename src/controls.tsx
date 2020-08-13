@@ -1,11 +1,6 @@
 import { init } from "./react-handoff";
+import defaults from "./controls.json";
 
-const { createControls, ControlsProvider } = init({
-  Box: {
-    card: {
-      bg: "gray.200"
-    }
-  }
-});
+const { createControls, ControlsProvider } = init(defaults);
 
 export { createControls, ControlsProvider };

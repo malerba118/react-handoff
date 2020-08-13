@@ -72,22 +72,50 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
     definitionsMap[key] = options.definitions;
 
     const useControls = (options: UseControlsOptions) => {
-      const ref = useRef<HTMLElement | null>();
-      const setSelected = useSetRecoilState(selectedAtom);
+      const ref = useRef<HTMLElement>();
+      const [selected, setSelected] = useRecoilState(selectedAtom);
       const setDimensions = useSetRecoilState(dimensionsAtom);
       const values = useRecoilValue(family(options.subkey));
       const select = () => setSelected({ key, subkey: options.subkey });
 
-      const attach = (el: HTMLElement) => {
-        ref.current = el;
-        if (el) {
-          el.addEventListener("click", (e: any) => {
-            if (!e._reactHandoffStopPropagation) {
-              setSelected({ key, subkey: options.subkey });
-              e._reactHandoffStopPropagation = true;
+      useEffect(() => {
+        if (
+          ref.current &&
+          selected.key === key &&
+          selected.subkey === options.subkey
+        ) {
+          let unsubscribeDimensionsListener = onDimensions(
+            ref.current,
+            setDimensions
+          );
+          const handleWindowResize = () => {
+            if (ref.current) {
+              setDimensions(ref.current.getBoundingClientRect());
             }
-          });
-          onDimensions(el, setDimensions);
+          };
+          window.addEventListener("resize", handleWindowResize);
+          const unsubscribeWindowResizeListener = () => {
+            window.removeEventListener("resize", handleWindowResize);
+          };
+          return () => {
+            unsubscribeDimensionsListener();
+            unsubscribeWindowResizeListener();
+          };
+        }
+      }, [selected.key, selected.subkey]);
+
+      const attach = (el: HTMLElement) => {
+        const handler = (e: MouseEvent) => {
+          setSelected({ key, subkey: options.subkey });
+          e.stopPropagation();
+          e.preventDefault();
+        };
+        if (el && el !== ref.current) {
+          if (ref.current) {
+            ref.current.removeEventListener("click", handler);
+          }
+          el.addEventListener("click", handler);
+          ref.current = el;
         }
       };
 
@@ -159,9 +187,7 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
 
     useEffect(() => {
       const fn = (e: any) => {
-        if (!e._reactHandoffStopPropagation) {
-          setSelected({ key: "", subkey: "" });
-        }
+        setSelected({ key: "", subkey: "" });
       };
       window.addEventListener("click", fn);
       return () => window.removeEventListener("click", fn);
@@ -171,10 +197,19 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
   };
 
   const SelectedIndicator = () => {
-    const dimensions = useRecoilValue(dimensionsAtom);
-    const { key } = useRecoilValue(selectedAtom);
+    const [dimensions, setDimensions] = useRecoilState(dimensionsAtom);
+    const { key, subkey } = useRecoilValue(selectedAtom);
 
-    console.log(dimensions);
+    useEffect(() => {
+      if (!key && !subkey) {
+        setDimensions({
+          top: 0,
+          left: 0,
+          width: 0,
+          height: 0
+        });
+      }
+    }, [key, subkey]);
 
     if (!families[key]) {
       return null;
@@ -189,6 +224,10 @@ export const init = (defaults?: Record<string, Record<string, any>>) => {
         border="4px"
         borderStyle="dashed"
         borderColor="teal.400"
+        onClick={e => {
+          e.stopPropagation();
+        }}
+        pointerEvents="none"
       />
     );
   };

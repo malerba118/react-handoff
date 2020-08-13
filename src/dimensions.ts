@@ -16,4 +16,8 @@ export const onDimensions = (el: HTMLElement, callback: DimensionsCallback) => {
     }
   });
   observer.observe(el);
+  return () => {
+    observer.unobserve(el);
+    observer.disconnect();
+  };
 };

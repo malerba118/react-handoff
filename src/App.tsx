@@ -30,7 +30,8 @@ function App() {
           <Badge rounded="full" px="2" variantColor="teal">
             New
           </Badge>
-          <Box
+          <ControlledBox
+            controlsKey="beds-and-baths"
             color="gray.500"
             fontWeight="semibold"
             letterSpacing="wide"
@@ -39,7 +40,7 @@ function App() {
             ml="2"
           >
             {property.beds} beds &bull; {property.baths} baths
-          </Box>
+          </ControlledBox>
         </Box>
 
         <Box

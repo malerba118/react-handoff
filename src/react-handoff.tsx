@@ -5,7 +5,8 @@ import {
   Box,
   FormLabel,
   Flex,
-  Checkbox
+  Checkbox,
+  IconButton
 } from "@chakra-ui/core";
 import {
   atom,
@@ -14,7 +15,9 @@ import {
   useRecoilValue,
   useRecoilState,
   useSetRecoilState,
-  RecoilState
+  RecoilState,
+  useRecoilTransactionObserver_UNSTABLE,
+  Snapshot
 } from "recoil";
 import { onDimensions } from "./dimensions";
 
@@ -39,6 +42,7 @@ export interface CreateControlsOptions<Controls> {
 type Defaults = Record<string, Record<string, { values: any; overrides: any }>>;
 
 export const init = (defaults?: Defaults) => {
+  const keyInfo: Record<string, Set<string>> = {};
   const families: Record<string, AtomFamily> = {};
   const overridesFamilies: Record<string, AtomFamily> = {};
   const definitionsMap: Record<string, ControlDefinitions<any>> = {};
@@ -66,6 +70,9 @@ export const init = (defaults?: Defaults) => {
       [K in keyof Controls]: boolean;
     };
     const key = options.key;
+    if (!keyInfo[key]) {
+      keyInfo[key] = new Set<string>();
+    }
     const definitions = options.definitions;
     const family = atomFamily<Controls, string>({
       key: `${key}-values`,
@@ -109,6 +116,7 @@ export const init = (defaults?: Defaults) => {
     }
 
     const useControls = (options: UseControlsOptions) => {
+      keyInfo[key].add(options.subkey);
       const ref = useRef<HTMLElement>();
       const [selected, setSelected] = useRecoilState(selectedAtom);
       const setDimensions = useSetRecoilState(dimensionsAtom);
@@ -179,6 +187,42 @@ export const init = (defaults?: Defaults) => {
     return useControls;
   };
 
+  const Exporter = () => {
+    const snapshotRef = useRef<Snapshot>();
+    useRecoilTransactionObserver_UNSTABLE(({ snapshot }) => {
+      snapshotRef.current = snapshot;
+    });
+
+    const handleClick = () => {
+      if (snapshotRef.current) {
+        const obj: any = {};
+        Object.keys(keyInfo).forEach(key => {
+          obj[key] = {};
+          keyInfo[key].forEach(subkey => {
+            obj[key][subkey] = {
+              values: (snapshotRef.current as Snapshot).getLoadable(
+                families[key](subkey)
+              ).contents,
+              overrides: (snapshotRef.current as Snapshot).getLoadable(
+                overridesFamilies[key](subkey)
+              ).contents
+            };
+          });
+        });
+        console.log(obj);
+      }
+    };
+
+    return (
+      <IconButton
+        onClick={handleClick}
+        aria-label="Download"
+        size="md"
+        icon="download"
+      />
+    );
+  };
+
   interface PanelProps {
     keys: {
       key: string;
@@ -191,9 +235,6 @@ export const init = (defaults?: Defaults) => {
     const overridesAtom = overridesFamilies[keys.key](keys.subkey);
     const [values, setValues] = useRecoilState(valuesAtom);
     const [overrides, setOverrides] = useRecoilState(overridesAtom);
-
-    console.log("values", values);
-    console.log("overrides", overrides);
 
     return (
       <Box
@@ -208,12 +249,15 @@ export const init = (defaults?: Defaults) => {
           e.stopPropagation();
         }}
       >
-        <Stack spacing="2">
-          <Heading size="lg">Controls</Heading>
-          <Heading size="xs" color="gray.500">
-            {keys.key} > {keys.subkey}
-          </Heading>
-        </Stack>
+        <Flex justify="space-between">
+          <Stack spacing="2">
+            <Heading size="lg">Controls</Heading>
+            <Heading size="xs" color="gray.500">
+              {keys.key} > {keys.subkey}
+            </Heading>
+          </Stack>
+          <Exporter />
+        </Flex>
         <Stack spacing={2} py={4}>
           {Object.keys(definitionsMap[keys.key]).map(fieldName => {
             const Field = definitionsMap[keys.key][fieldName];
@@ -252,7 +296,7 @@ export const init = (defaults?: Defaults) => {
     );
   };
 
-  const Listeners = () => {
+  const Clickaway = () => {
     const setSelected = useSetRecoilState(selectedAtom);
 
     useEffect(() => {
@@ -318,7 +362,7 @@ export const init = (defaults?: Defaults) => {
         {children}
         <SelectedIndicator />
         <ControlsPanel />
-        <Listeners />
+        <Clickaway />
       </RecoilRoot>
     );
   };

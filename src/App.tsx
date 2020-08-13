@@ -43,26 +43,35 @@ function App() {
           </ControlledBox>
         </Box>
 
-        <Box
+        <ControlledBox
+          controlsKey="property-title"
           mt="1"
           fontWeight="semibold"
           as="h4"
           lineHeight="tight"
           isTruncated
+          fontSize="lg"
         >
           {property.title}
-        </Box>
+        </ControlledBox>
 
-        <Box>
+        <ControlledBox controlsKey="price" fontSize="sm">
           {property.formattedPrice}
           <Box as="span" color="gray.600" fontSize="sm">
             / wk
           </Box>
-        </Box>
+        </ControlledBox>
 
-        <Box d="flex" mt="2" alignItems="center" color="gray.600" fontSize="sm">
+        <ControlledBox
+          controlsKey="reviews-count"
+          d="flex"
+          mt="2"
+          alignItems="center"
+          color="gray.600"
+          fontSize="sm"
+        >
           {property.reviewCount} reviews
-        </Box>
+        </ControlledBox>
       </Box>
     </ControlledBox>
   );

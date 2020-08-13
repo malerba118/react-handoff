@@ -30,7 +30,6 @@ export const spaceValues = [
 export const sizeValues = [
   "xs",
   "sm",
-  "md",
   "lg",
   "xl",
   "2xl",

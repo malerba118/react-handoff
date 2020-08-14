@@ -1,4 +1,4 @@
-import { Box, Image, Badge } from "@chakra-ui/core";
+import { Flex, Box, Image, Badge } from "@chakra-ui/core";
 import * as React from "react";
 import { createControls } from "./controls";
 import ControlledBox from "./ControlledBox";
@@ -17,63 +17,65 @@ function App() {
   };
 
   return (
-    <ControlledBox
-      controlsKey="card"
-      maxW="sm"
-      borderWidth="1px"
-      rounded="lg"
-      overflow="hidden"
-    >
-      <Image src={property.imageUrl} alt={property.imageAlt} />
-      <Box p="6">
-        <Box d="flex" alignItems="baseline">
-          <Badge rounded="full" px="2" variantColor="teal">
-            New
-          </Badge>
+    <Flex h="100%" justify="center" align="center" bg="gray.200">
+      <ControlledBox
+        controlsKey="card"
+        maxW="sm"
+        rounded="lg"
+        overflow="hidden"
+        bg="white"
+      >
+        <Image src={property.imageUrl} alt={property.imageAlt} />
+        <Box p="6">
+          <Box d="flex" alignItems="baseline">
+            <Badge rounded="full" px="2" variantColor="teal">
+              New
+            </Badge>
+            <ControlledBox
+              controlsKey="beds-and-baths"
+              color="gray.500"
+              fontWeight="semibold"
+              letterSpacing="wide"
+              fontSize="xs"
+              textTransform="uppercase"
+              ml="2"
+            >
+              {property.beds} beds &bull; {property.baths} baths
+            </ControlledBox>
+          </Box>
+
           <ControlledBox
-            controlsKey="beds-and-baths"
-            color="gray.500"
+            controlsKey="property-title"
+            mt="1"
             fontWeight="semibold"
-            letterSpacing="wide"
-            fontSize="xs"
-            textTransform="uppercase"
-            ml="2"
+            as="h4"
+            lineHeight="tight"
+            isTruncated
+            fontSize="lg"
           >
-            {property.beds} beds &bull; {property.baths} baths
+            {property.title}
+          </ControlledBox>
+
+          <ControlledBox controlsKey="price" fontSize="sm">
+            {property.formattedPrice}
+            <Box as="span" color="gray.600" fontSize="sm">
+              / wk
+            </Box>
+          </ControlledBox>
+
+          <ControlledBox
+            controlsKey="reviews-count"
+            d="flex"
+            mt="2"
+            alignItems="center"
+            color="gray.600"
+            fontSize="sm"
+          >
+            {property.reviewCount} reviews
           </ControlledBox>
         </Box>
-
-        <ControlledBox
-          controlsKey="property-title"
-          mt="1"
-          fontWeight="semibold"
-          as="h4"
-          lineHeight="tight"
-          isTruncated
-          fontSize="lg"
-        >
-          {property.title}
-        </ControlledBox>
-
-        <ControlledBox controlsKey="price" fontSize="sm">
-          {property.formattedPrice}
-          <Box as="span" color="gray.600" fontSize="sm">
-            / wk
-          </Box>
-        </ControlledBox>
-
-        <ControlledBox
-          controlsKey="reviews-count"
-          d="flex"
-          mt="2"
-          alignItems="center"
-          color="gray.600"
-          fontSize="sm"
-        >
-          {property.reviewCount} reviews
-        </ControlledBox>
-      </Box>
-    </ControlledBox>
+      </ControlledBox>
+    </Flex>
   );
 }
 

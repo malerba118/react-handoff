@@ -20,6 +20,10 @@ import {
   Snapshot
 } from "recoil";
 import { onDimensions } from "./dimensions";
+import { saveAs } from "file-saver";
+import { motion } from "framer-motion";
+
+const MotionBox = motion.custom(Box);
 
 type AtomFamily = (subkey: string) => RecoilState<any>;
 
@@ -179,7 +183,6 @@ export const init = (defaults?: Defaults) => {
 
       return {
         attach,
-        select,
         values: values as Controls
       };
     };
@@ -209,7 +212,10 @@ export const init = (defaults?: Defaults) => {
             };
           });
         });
-        console.log(obj);
+        const blob = new Blob([JSON.stringify(obj)], {
+          type: "application/json;charset=utf-8"
+        });
+        saveAs(blob, "controls.json");
       }
     };
 
@@ -243,7 +249,7 @@ export const init = (defaults?: Defaults) => {
         right={0}
         bottom={0}
         width={300}
-        bg="gray.100"
+        bg="white"
         p={4}
         onClick={e => {
           e.stopPropagation();
@@ -253,7 +259,7 @@ export const init = (defaults?: Defaults) => {
           <Stack spacing="2">
             <Heading size="lg">Controls</Heading>
             <Heading size="xs" color="gray.500">
-              {keys.key} > {keys.subkey}
+              {keys.key} {">"} {keys.subkey}
             </Heading>
           </Stack>
           <Exporter />
@@ -330,12 +336,22 @@ export const init = (defaults?: Defaults) => {
     }
 
     return (
-      <Box
+      <MotionBox
+        initial={{ opacity: -10, scale: 0 }}
+        animate={{
+          height: dimensions.height,
+          width: dimensions.width,
+          top: dimensions.top,
+          left: dimensions.left,
+          opacity: 1,
+          scale: 1,
+          transition: {
+            type: "spring",
+            stiffness: 800,
+            damping: 70
+          }
+        }}
         position="fixed"
-        w={dimensions.width}
-        h={dimensions.height}
-        top={dimensions.top}
-        left={dimensions.left}
         border="4px"
         borderStyle="dashed"
         borderColor="teal.400"

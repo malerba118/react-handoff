@@ -1,7 +1,7 @@
 import { Box, BoxProps } from "@chakra-ui/core";
 import React, { FC } from "react";
 import { createControls } from "./controls";
-import { select } from "./fields";
+import { select } from "./react-handoff/fields";
 import { colorValues, spaceValues, sizeValues } from "./constants";
 import "./styles.css";
 

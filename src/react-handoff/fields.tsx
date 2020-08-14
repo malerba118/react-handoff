@@ -1,21 +1,24 @@
 import React, { FC } from "react";
 import { Switch, Select } from "@chakra-ui/core";
-import { optionalCallExpression } from "@babel/types";
 
-export interface BooleanFieldProps {
+export interface SwitchFieldProps {
   value: boolean;
   onUpdate: (value: boolean) => void;
 }
 
-export const BooleanField: FC<BooleanFieldProps> = props => {
-  return (
-    <Switch
-      color="teal"
-      size="lg"
-      onChange={(e: any) => props.onUpdate(e.target.checked)}
-      isChecked={props.value}
-    />
-  );
+// wanted to name this switch but it's a reserved word
+export const switchable = () => {
+  const SwitchField: FC<SwitchFieldProps> = props => {
+    return (
+      <Switch
+        color="teal"
+        size="lg"
+        onChange={(e: any) => props.onUpdate(e.target.checked)}
+        isChecked={props.value}
+      />
+    );
+  };
+  return SwitchField;
 };
 
 export interface SelectFieldProps {

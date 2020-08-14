@@ -45,7 +45,14 @@ export interface CreateControlsOptions<Controls> {
 
 type Defaults = Record<string, Record<string, { values: any; overrides: any }>>;
 
-export const init = (defaults?: Defaults) => {
+interface InitOptions {
+  allowEditing?: boolean;
+}
+
+export const init = (
+  defaults?: Defaults,
+  { allowEditing = true }: InitOptions = {}
+) => {
   const keyInfo: Record<string, Set<string>> = {};
   const families: Record<string, AtomFamily> = {};
   const overridesFamilies: Record<string, AtomFamily> = {};
@@ -65,6 +72,14 @@ export const init = (defaults?: Defaults) => {
       height: 0,
       width: 0
     }
+  });
+  const editModeAtom = atom({
+    key: "edit-mode",
+    default: false
+  });
+  const nullAtom = atom({
+    key: "null",
+    default: null
   });
 
   const createControls = <Controls extends {}>(
@@ -144,7 +159,8 @@ export const init = (defaults?: Defaults) => {
         if (
           ref.current &&
           selected.key === key &&
-          selected.subkey === options.subkey
+          selected.subkey === options.subkey &&
+          allowEditing
         ) {
           let unsubscribeDimensionsListener = onDimensions(
             ref.current,
@@ -164,9 +180,12 @@ export const init = (defaults?: Defaults) => {
             unsubscribeWindowResizeListener();
           };
         }
-      }, [selected.key, selected.subkey]);
+      }, [selected.key, selected.subkey, allowEditing]);
 
       const attach = (el: HTMLElement) => {
+        if (!allowEditing) {
+          return null;
+        }
         const handler = (e: MouseEvent) => {
           setSelected({ key, subkey: options.subkey });
           e.stopPropagation();
@@ -225,28 +244,64 @@ export const init = (defaults?: Defaults) => {
         aria-label="Download"
         size="md"
         icon="download"
+        variant="ghost"
       />
     );
   };
 
-  interface PanelProps {
-    keys: {
-      key: string;
-      subkey: string;
-    };
-  }
+  const ToggleEditMode = () => {
+    const [editMode, setEditMode] = useRecoilState(editModeAtom);
 
-  const Panel: FC<PanelProps> = ({ keys }) => {
-    const valuesAtom = families[keys.key](keys.subkey);
-    const overridesAtom = overridesFamilies[keys.key](keys.subkey);
+    if (!allowEditing) {
+      return null;
+    }
+
+    return (
+      <Box position="fixed" bottom="16px" right="16px">
+        {editMode && (
+          <IconButton
+            variantColor="teal"
+            onClick={() => setEditMode(false)}
+            aria-label="OK"
+            size="md"
+            icon={"check"}
+          />
+        )}
+        {!editMode && (
+          <IconButton
+            variantColor="teal"
+            onClick={() => setEditMode(true)}
+            aria-label="Edit"
+            size="md"
+            icon={"edit"}
+          />
+        )}
+      </Box>
+    );
+  };
+
+  const ControlsPanel: FC = () => {
+    const { key, subkey } = useRecoilValue(selectedAtom);
+    const editMode = useRecoilValue(editModeAtom);
+    const valuesAtom = !key && !subkey ? nullAtom : families[key](subkey);
+    const overridesAtom =
+      !key && !subkey ? nullAtom : overridesFamilies[key](subkey);
     const [values, setValues] = useRecoilState(valuesAtom);
     const [overrides, setOverrides] = useRecoilState(overridesAtom);
 
+    const definitions = definitionsMap[key] || {};
+
+    if (!allowEditing) {
+      return null;
+    }
+
     return (
-      <Box
+      <MotionBox
+        animate={{
+          right: editMode ? 0 : -300
+        }}
         position="fixed"
         top={0}
-        right={0}
         bottom={0}
         width={300}
         bg="white"
@@ -259,14 +314,15 @@ export const init = (defaults?: Defaults) => {
           <Stack spacing="2">
             <Heading size="lg">Controls</Heading>
             <Heading size="xs" color="gray.500">
-              {keys.key} {">"} {keys.subkey}
+              {!!key && !!subkey ? `${key} > ${subkey}` : ""}
             </Heading>
           </Stack>
           <Exporter />
         </Flex>
         <Stack spacing={2} py={4}>
-          {Object.keys(definitionsMap[keys.key]).map(fieldName => {
-            const Field = definitionsMap[keys.key][fieldName];
+          {!Object.keys(definitions).length && <Box>No selection.</Box>}
+          {Object.keys(definitions).map(fieldName => {
+            const Field = definitionsMap[key][fieldName];
             const value = values[fieldName];
             return (
               <Stack key={fieldName}>
@@ -298,7 +354,7 @@ export const init = (defaults?: Defaults) => {
             );
           })}
         </Stack>
-      </Box>
+      </MotionBox>
     );
   };
 
@@ -306,11 +362,13 @@ export const init = (defaults?: Defaults) => {
     const setSelected = useSetRecoilState(selectedAtom);
 
     useEffect(() => {
-      const fn = (e: any) => {
-        setSelected({ key: "", subkey: "" });
-      };
-      window.addEventListener("click", fn);
-      return () => window.removeEventListener("click", fn);
+      if (allowEditing) {
+        const fn = (e: any) => {
+          setSelected({ key: "", subkey: "" });
+        };
+        window.addEventListener("click", fn);
+        return () => window.removeEventListener("click", fn);
+      }
     }, []);
 
     return null;
@@ -319,6 +377,7 @@ export const init = (defaults?: Defaults) => {
   const SelectedIndicator = () => {
     const [dimensions, setDimensions] = useRecoilState(dimensionsAtom);
     const { key, subkey } = useRecoilValue(selectedAtom);
+    const editMode = useRecoilValue(editModeAtom);
 
     useEffect(() => {
       if (!key && !subkey) {
@@ -331,7 +390,7 @@ export const init = (defaults?: Defaults) => {
       }
     }, [key, subkey]);
 
-    if (!families[key]) {
+    if (!families[key] || !editMode) {
       return null;
     }
 
@@ -363,21 +422,13 @@ export const init = (defaults?: Defaults) => {
     );
   };
 
-  const ControlsPanel = () => {
-    const { key, subkey } = useRecoilValue(selectedAtom);
-
-    if (!families[key]) {
-      return null;
-    }
-    return <Panel keys={{ key, subkey }} />;
-  };
-
   const ControlsProvider: FC = ({ children }) => {
     return (
       <RecoilRoot>
         {children}
         <SelectedIndicator />
         <ControlsPanel />
+        <ToggleEditMode />
         <Clickaway />
       </RecoilRoot>
     );

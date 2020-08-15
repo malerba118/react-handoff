@@ -1,1 +1,43 @@
-{}
+{
+  "Box": {
+    "card": {
+      "values": {},
+      "overrides": {}
+    },
+    "beds-and-baths": {
+      "values": {},
+      "overrides": {}
+    },
+    "property-title": {
+      "values": {
+        "color": "gray.600"
+      },
+      "overrides": {}
+    },
+    "price": {
+      "values": {},
+      "overrides": {}
+    },
+    "reviews-count": {
+      "values": {},
+      "overrides": {}
+    }
+  },
+  "Image": {
+    "card-image": {
+      "values": {
+        "objectFit": "cover"
+      },
+      "overrides": {}
+    }
+  },
+  "Badge": {
+    "badge": {
+      "values": {
+        "fontSize": "sm",
+        "variantColor": "teal"
+      },
+      "overrides": {}
+    }
+  }
+}

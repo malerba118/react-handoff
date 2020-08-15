@@ -1,21 +1,20 @@
-import { Flex, Box, Image, Badge } from "@chakra-ui/core";
+import { Flex, Box, Badge } from "@chakra-ui/core";
 import * as React from "react";
-import { createControls } from "./controls";
 import ControlledBox from "./ControlledBox";
-import "./styles.css";
+import ControlledImage from "./ControlledImage";
+import ControlledBadge from "./ControlledBadge";
+
+const property = {
+  imageUrl: "https://picsum.photos/id/594/600/400",
+  imageAlt: "Home on the water",
+  beds: 3,
+  baths: 2,
+  title: "Humble home on the water",
+  formattedPrice: "$500.00",
+  reviewCount: 34
+};
 
 function App() {
-  const property = {
-    imageUrl: "https://bit.ly/2Z4KKcF",
-    imageAlt: "Rear view of modern home with pool",
-    beds: 3,
-    baths: 2,
-    title: "Modern home in city center in the heart of historic Los Angeles",
-    formattedPrice: "$1,900.00",
-    reviewCount: 34,
-    rating: 4
-  };
-
   return (
     <Flex h="100%" justify="center" align="center" bg="gray.200">
       <ControlledBox
@@ -25,12 +24,18 @@ function App() {
         overflow="hidden"
         bg="white"
       >
-        <Image src={property.imageUrl} alt={property.imageAlt} />
+        <ControlledImage
+          controlsKey="card-image"
+          height="200px"
+          width="100%"
+          src={property.imageUrl}
+          alt={property.imageAlt}
+        />
         <Box p="6">
           <Box d="flex" alignItems="baseline">
-            <Badge rounded="full" px="2" variantColor="teal">
+            <ControlledBadge controlsKey="badge" rounded="full" px="2">
               New
-            </Badge>
+            </ControlledBadge>
             <ControlledBox
               controlsKey="beds-and-baths"
               color="gray.500"

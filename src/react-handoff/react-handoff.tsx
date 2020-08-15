@@ -231,7 +231,7 @@ export const init = (
             };
           });
         });
-        const blob = new Blob([JSON.stringify(obj)], {
+        const blob = new Blob([JSON.stringify(obj, null, 2)], {
           type: "application/json;charset=utf-8"
         });
         saveAs(blob, "controls.json");

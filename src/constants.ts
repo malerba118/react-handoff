@@ -1,11 +1,21 @@
-export const colorValues = ["gray", "blue", "teal"].reduce(
-  (colors, baseColor) => {
-    const variants = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
-    colors.push(...variants.map(v => baseColor + "." + v));
-    return colors;
-  },
-  [] as string[]
-);
+export const colorCategoryValues = [
+  "gray",
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "teal",
+  "blue",
+  "cyan",
+  "purple",
+  "pink"
+];
+
+export const colorValues = colorCategoryValues.reduce((colors, baseColor) => {
+  const variants = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+  colors.push(...variants.map(v => baseColor + "." + v));
+  return colors;
+}, [] as string[]);
 
 export const spaceValues = [
   "0",

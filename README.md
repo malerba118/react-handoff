@@ -1,6 +1,6 @@
 # react-handoff
 
-This is a react library POC that enables developers and designers to work in parallel on production code.
+This is a react library POC that bakes into any app a minimal visual editor that enables designers and developers to work in parallel on production code.
 
 ## In a nutshell
 With this library, **this**:
@@ -81,7 +81,7 @@ will give you **this**:
 
 
 ## How does it work?
-This POC works similar to the way theme providers work. By centralizing prop defaults and overrides in a json file, we can allow components to consume the values they need from the configuration. In this demo, `controls.json`
+This app works similar to the way that theme providers work. By centralizing prop defaults and overrides in a json file and providing them across the app, we can allow components to consume the values they need from the configuration. In this demo, `controls.json`
 contains all of the values configured via the visual editor.
 
 To set up the code, we first need to call `init`, passing in our defaults and an indication of the environment we're running in (because we don't want editor functionality to show up in prod).
@@ -118,7 +118,7 @@ const useControls = createControls<ImageControls>({
 });
 ```
 
-This may seem mysterious, but `select` actually just returns a react component, so you can pass any key/val pair as a definition as long as the key is a string and the value is a component that accepts a `value` and `onUpdate` props.
+This may seem mysterious, but `select` actually just returns a react component, so you can pass any key/val pair as a definition as long as the key is a string and the value is a component that adheres to the following component interface.
 
 ```tsx
 type Field<T> = ComponentType<{
@@ -127,7 +127,7 @@ type Field<T> = ComponentType<{
 }>
 ```
 
-Lastly, all we have to do is consume our hook.
+Lastly, we have to consume our `useControls` hook.
 
 ```tsx
 interface ControlledImageProps extends ImageProps {
@@ -146,11 +146,17 @@ const ControlledImage: FC<ControlledImageProps> = ({
     }
   });
 
-  return <Image {...otherProps} ref={attach} objectFit={values.objectFit} />;
+  return (
+      <Image 
+        {...otherProps} 
+        ref={attach} 
+        objectFit={values.objectFit} 
+      />
+  );
 };
 ```
 
-An instance of the `ControlledImage` component would look for the key: 'Image' and subkey: controlsKey in the `controls.json`.
+An instance of the `ControlledImage` component would look for the key: `'Image'` and subkey: `controlsKey` in the `controls.json`.
 
 ```tsx
 // This would have access to values located at
@@ -158,11 +164,13 @@ An instance of the `ControlledImage` component would look for the key: 'Image' a
 <ControlledImage controlsKey="card-image" />
 ```
 
+Internally, the `ControlledImage` component has access to the `values` and `overrides` that live at this location in the `controls.json`.
+
 ![Screen Shot 2020-08-14 at 10 06 50 PM](https://user-images.githubusercontent.com/5760059/90303473-e0a90500-de73-11ea-9bac-fec58b68591f.png)
 
 
-If the passthrough value for `objectFit` is defined, then that value will be passed through to the `values` object. However, if the passthrough value for `objectFit` is `undefined` then the value located at `controlsJson['Image']['card-image'].values.objectFit` will be used as the default value. Furthermore, even if the passthrough value for `objectFit` is defined, it can be overriden by checking the "Important" checkbox via the editor controls. 
+If the passthrough value for `objectFit` is defined when invoking `useControls`, then that value will be passed through to the returned `values` object. However, if the passthrough value for `objectFit` is `undefined` then the value located at `controlsJson['Image']['card-image'].values.objectFit` will be used as a default value. Furthermore, even if the passthrough value for `objectFit` is defined, it can be overriden by checking the "Important" checkbox via the editor controls. 
 
-I've only built out a few controls options on a few chakra-ui components, but you can see how it could be extended to all of chakra-ui and other component libraries/custom components.
+I've only built out a few controls options on a few chakra-ui components, but you can see how it could be extended to all of chakra-ui and other component libraries/custom components as well.
 
 This pattern allows developers to develop and designers to design all at once with all of the power of libraries such as chakra-ui.

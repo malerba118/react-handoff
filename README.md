@@ -81,7 +81,7 @@ will give you **this**:
 
 
 ## How does it work?
-This app works similar to the way that theme providers work. By centralizing prop defaults and overrides in a json file and providing them across the app, we can allow components to consume the values they need from the configuration. In this demo, `controls.json`
+This app works similar to the way that theme providers work. By centralizing prop defaults and overrides in a json file and providing them across the app, we can allow components to consume the values they need from the configuration via designated keys. In this demo, `controls.json`
 contains all of the values configured via the visual editor.
 
 To set up the code, we first need to call `init`, passing in our defaults and an indication of the environment we're running in (because we don't want editor functionality to show up in prod).
@@ -170,6 +170,8 @@ Internally, the `ControlledImage` component has access to the `values` and `over
 
 
 If the passthrough value for `objectFit` is defined when invoking `useControls`, then that value will be passed through to the returned `values` object. However, if the passthrough value for `objectFit` is `undefined` then the value located at `controlsJson['Image']['card-image'].values.objectFit` will be used as a default value. Furthermore, even if the passthrough value for `objectFit` is defined, it can be overriden by checking the "Important" checkbox via the editor controls. 
+
+The `attach` method returned from `useControls` takes in an `HTMLElement` and listens to resize/click events on it. Every time a resize happens, the new dimensions of the active element are propagated to the globally rendered active element indicator (that dashed teal box). This way we can observe the app without polluting it with extra layers of dom crap.
 
 I've only built out a few controls options on a few chakra-ui components, but you can see how it could be extended to all of chakra-ui and other component libraries/custom components as well.
 

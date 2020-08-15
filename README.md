@@ -75,7 +75,7 @@ function App() {
   );
 }
 ```
-will give you **this**:
+will give you **[this](https://codesandbox.io/s/async-night-7kyrq?file=/src/App.tsx)**:
 
 ![ezgif com-video-to-gif](https://user-images.githubusercontent.com/5760059/90302977-a5a4d280-de6f-11ea-8aa7-b8a93a757fdf.gif)
 

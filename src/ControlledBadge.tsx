@@ -2,12 +2,7 @@ import { Badge, BadgeProps } from "@chakra-ui/core";
 import React, { FC } from "react";
 import { createControls } from "./controls";
 import { select } from "./react-handoff/fields";
-import {
-  colorValues,
-  spaceValues,
-  sizeValues,
-  colorCategoryValues
-} from "./constants";
+import { spaceValues, sizeValues, colorCategoryValues } from "./constants";
 
 interface BadgeControls {
   variantColor: BadgeProps["variantColor"];

@@ -1,4 +1,4 @@
-import { Flex, Box, Badge } from "@chakra-ui/core";
+import { Flex, Box } from "@chakra-ui/core";
 import * as React from "react";
 import ControlledBox from "./ControlledBox";
 import ControlledImage from "./ControlledImage";

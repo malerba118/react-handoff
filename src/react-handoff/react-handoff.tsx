@@ -156,6 +156,12 @@ export const init = (
       });
 
       useEffect(() => {
+        if (ref.current) {
+          setDimensions(ref.current.getBoundingClientRect());
+        }
+      }, [JSON.stringify(values)]);
+
+      useEffect(() => {
         if (
           ref.current &&
           selected.key === key &&
@@ -406,8 +412,9 @@ export const init = (
           scale: 1,
           transition: {
             type: "spring",
-            stiffness: 800,
-            damping: 70
+            stiffness: 1000,
+            damping: 200,
+            mass: 1
           }
         }}
         position="fixed"

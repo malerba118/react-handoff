@@ -176,3 +176,10 @@ The `attach` method returned from `useControls` takes in an `HTMLElement` and li
 I've only built out a few controls options on a few chakra-ui components, but you can see how it could be extended to all of chakra-ui and other component libraries/custom components as well.
 
 This pattern allows developers to develop and designers to design all at once with all of the power of libraries such as chakra-ui.
+
+## Running locally
+
+```bash
+yarn install
+yarn start
+```

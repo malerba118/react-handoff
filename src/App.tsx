@@ -3,6 +3,11 @@ import { Flex } from "@chakra-ui/core";
 import { components } from "./controls";
 const { Box, Image, Badge } = components;
 
+// The app's kind of ugly, so you might want to fix it with
+// the visual editor controls. Once it looks good, click download
+// and replace the controls.json in the root of this repo with
+// the downloaded one to persist your changes.
+
 const property = {
   imageUrl: "https://picsum.photos/id/594/600/400",
   imageAlt: "Home on the water",

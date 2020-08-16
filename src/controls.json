@@ -1,43 +1,64 @@
 {
-  "Box": {
-    "card": {
-      "values": {},
-      "overrides": {}
+    "Badge": {
+      "badge": {
+        "values": {
+          "fontSize": "sm",
+          "variantColor": "yellow"
+        },
+        "overrides": {}
+      }
     },
-    "beds-and-baths": {
-      "values": {},
-      "overrides": {}
-    },
-    "property-title": {
-      "values": {
-        "color": "gray.600"
+    "Box": {
+      "card": {
+        "values": {
+          "bg": "pink.600"
+        },
+        "overrides": {
+          "bg": true
+        }
       },
-      "overrides": {}
-    },
-    "price": {
-      "values": {},
-      "overrides": {}
-    },
-    "reviews-count": {
-      "values": {},
-      "overrides": {}
-    }
-  },
-  "Image": {
-    "card-image": {
-      "values": {
-        "objectFit": "cover"
+      "beds-and-baths": {
+        "values": {
+          "color": "gray.100"
+        },
+        "overrides": {
+          "color": true
+        }
       },
-      "overrides": {}
-    }
-  },
-  "Badge": {
-    "badge": {
-      "values": {
-        "fontSize": "sm",
-        "variantColor": "teal"
+      "property-title": {
+        "values": {
+          "color": "gray.50",
+          "fontSize": "xs"
+        },
+        "overrides": {
+          "fontSize": true
+        }
       },
-      "overrides": {}
+      "price": {
+        "values": {
+          "color": "gray.200",
+          "fontSize": "3xl"
+        },
+        "overrides": {
+          "color": false,
+          "fontSize": true
+        }
+      },
+      "reviews-count": {
+        "values": {
+          "color": "purple.900"
+        },
+        "overrides": {
+          "color": true
+        }
+      }
+    },
+    "Image": {
+      "card-image": {
+        "values": {
+          "objectFit": "fill"
+        },
+        "overrides": {}
+      }
     }
   }
-}

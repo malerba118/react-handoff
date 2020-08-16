@@ -27,6 +27,8 @@ const MotionBox = motion.custom(Box);
 
 type AtomFamily = (subkey: string) => RecoilState<any>;
 
+export type CreateControls = ReturnType<typeof init>["createControls"];
+
 export interface FieldProps<T> {
   value: T;
   onUpdate: (val: T) => void;
@@ -141,7 +143,6 @@ export const init = (
       const setDimensions = useSetRecoilState(dimensionsAtom);
       let values: any = useRecoilValue(family(options.subkey));
       const overrides: any = useRecoilValue(overridesFamily(options.subkey));
-      const select = () => setSelected({ key, subkey: options.subkey });
       const passthrough: any = options.passthrough || {};
 
       values = { ...values };

@@ -1,8 +1,7 @@
-import { Flex, Box } from "@chakra-ui/core";
 import * as React from "react";
-import ControlledBox from "./ControlledBox";
-import ControlledImage from "./ControlledImage";
-import ControlledBadge from "./ControlledBadge";
+import { Flex } from "@chakra-ui/core";
+import { components } from "./controls";
+const { Box, Image, Badge } = components;
 
 const property = {
   imageUrl: "https://picsum.photos/id/594/600/400",
@@ -17,14 +16,14 @@ const property = {
 function App() {
   return (
     <Flex h="100%" justify="center" align="center" bg="gray.200">
-      <ControlledBox
+      <Box
         controlsKey="card"
         maxW="sm"
         rounded="lg"
         overflow="hidden"
         bg="white"
       >
-        <ControlledImage
+        <Image
           controlsKey="card-image"
           height="200px"
           width="100%"
@@ -33,10 +32,10 @@ function App() {
         />
         <Box p="6">
           <Box d="flex" alignItems="baseline">
-            <ControlledBadge controlsKey="badge" rounded="full" px="2">
+            <Badge controlsKey="badge" rounded="full" px="2">
               New
-            </ControlledBadge>
-            <ControlledBox
+            </Badge>
+            <Box
               controlsKey="beds-and-baths"
               color="gray.500"
               fontWeight="semibold"
@@ -46,10 +45,10 @@ function App() {
               ml="2"
             >
               {property.beds} beds &bull; {property.baths} baths
-            </ControlledBox>
+            </Box>
           </Box>
 
-          <ControlledBox
+          <Box
             controlsKey="property-title"
             mt="1"
             fontWeight="semibold"
@@ -59,16 +58,15 @@ function App() {
             fontSize="lg"
           >
             {property.title}
-          </ControlledBox>
+          </Box>
 
-          <ControlledBox controlsKey="price" fontSize="sm">
+          <Box controlsKey="price" fontSize="sm">
             {property.formattedPrice}
             <Box as="span" color="gray.600" fontSize="sm">
               / wk
             </Box>
-          </ControlledBox>
-
-          <ControlledBox
+          </Box>
+          <Box
             controlsKey="reviews-count"
             d="flex"
             mt="2"
@@ -77,9 +75,9 @@ function App() {
             fontSize="sm"
           >
             {property.reviewCount} reviews
-          </ControlledBox>
+          </Box>
         </Box>
-      </ControlledBox>
+      </Box>
     </Flex>
   );
 }

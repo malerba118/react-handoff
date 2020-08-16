@@ -1,8 +1,8 @@
-import { init } from "./react-handoff";
+import { init } from "./react-handoff-chakra";
 import defaults from "./controls.json";
 
-const { createControls, ControlsProvider } = init(defaults, {
+const { createControls, ControlsProvider, components } = init(defaults, {
   allowEditing: process.env.NODE_ENV === "development"
 });
 
-export { createControls, ControlsProvider };
+export { createControls, ControlsProvider, components };

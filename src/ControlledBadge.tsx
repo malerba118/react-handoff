@@ -48,8 +48,6 @@ const ControlledBadge: FC<ControlledBadgeProps> = ({
     }
   });
 
-  console.log(values);
-
   return (
     <Badge
       {...otherProps}
